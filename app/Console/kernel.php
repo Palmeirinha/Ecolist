@@ -19,7 +19,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('cache:clear')->daily();
 
         $schedule->command('model:prune', [
-            '--model' => [App\Models\Alimento::class],
+           // '--model' => [App\Models\Alimento::class],
             '--days' => 30,
         ])->daily();
     }

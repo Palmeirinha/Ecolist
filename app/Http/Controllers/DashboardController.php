@@ -6,10 +6,8 @@ use App\Models\Alimento;
 use App\Models\Categoria;
 use Illuminate\Support\Facades\DB;
 
-
 class DashboardController extends Controller
 {
-  
     /**
      * Exibe o dashboard com estatísticas dos alimentos
      * 
@@ -17,31 +15,25 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        // Obtém o ID do usuário autenticado
         $userId = auth()->id();
-        
-        // Calcula o total de alimentos cadastrados pelo usuário
+
         $total = Alimento::where('user_id', $userId)->count();
-        
-        // Busca alimentos que vencem nos próximos 3 dias
+
         $vencendo = Alimento::where('user_id', $userId)
             ->whereDate('validade', '<=', now()->addDays(3))
             ->whereDate('validade', '>=', now())
             ->count();
-            
-        // Busca alimentos já vencidos
+
         $vencidos = Alimento::where('user_id', $userId)
             ->whereDate('validade', '<', now())
             ->count();
 
-        // Obtém os 5 alimentos mais recentemente cadastrados
         $alimentosRecentes = Alimento::with('categoria')
             ->where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
-        // Lista alimentos próximos do vencimento para alerta
         $alimentosVencendo = Alimento::with('categoria')
             ->where('user_id', $userId)
             ->whereDate('validade', '<=', now()->addDays(3))
@@ -67,7 +59,6 @@ class DashboardController extends Controller
                 ];
             });
 
-        // Calcula estatísticas dos últimos 7 dias
         $estatisticasSemana = [
             'cadastrados' => Alimento::where('user_id', $userId)
                 ->where('created_at', '>=', now()->subDays(7))
@@ -78,7 +69,6 @@ class DashboardController extends Controller
                 ->count()
         ];
 
-        // Retorna a view com todos os dados calculados
         return view('dashboard', compact(
             'total',
             'vencendo',

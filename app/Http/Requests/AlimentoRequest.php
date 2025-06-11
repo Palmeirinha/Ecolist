@@ -7,7 +7,6 @@ use Carbon\Carbon;
 
 class AlimentoRequest extends FormRequest
 {
-   
     private $palavrasPermitidas = [
         'fresco', 'natural', 'orgânico', 'integral', 'light', 'diet', 'zero', 'sem', 'com',
         'pedaços', 'fatias', 'inteiro', 'cortado', 'descascado', 'ralado', 'fatiado',
@@ -15,24 +14,12 @@ class AlimentoRequest extends FormRequest
         'maduro', 'verde', 'doce', 'azedo', 'amargo'
     ];
 
-    /**
-     * Lista de palavras não permitidas
-     */
     private $palavrasBloqueadas = [
-        // Objetos e materiais não comestíveis
         'papel', 'plástico', 'metal', 'vidro', 'madeira', 'tecido', 'roupa', 'sapato',
         'celular', 'computador', 'telefone', 'carro', 'moto', 'bicicleta',
-        
-        // Palavras ofensivas ou inadequadas
         'merda', 'bosta', 'lixo', 'porcaria', 'droga', 'cocaina', 'maconha',
-        
-        // Objetos domésticos
         'mesa', 'cadeira', 'sofá', 'cama', 'armário', 'gaveta', 'porta', 'janela',
-        
-        // Palavras genéricas não relacionadas a alimentos
         'coisa', 'negócio', 'treco', 'bagulho', 'teste', 'exemplo', 'qualquer',
-        
-        // Gírias e expressões informais
         'bagaça', 'muamba', 'parada', 'troço', 'trem'
     ];
 
@@ -50,19 +37,16 @@ class AlimentoRequest extends FormRequest
                 'max:255',
                 'min:3',
                 'regex:/^[A-Za-zÀ-ú\s]+$/',
-                'not_regex:/<script.*?>.*?<\/script>/i', // Proteção contra XSS
+                'not_regex:/<script.*?>.*?<\/script>/i',
                 function ($attribute, $value, $fail) {
-                    // Validação do tamanho mínimo após trim
                     if (strlen(trim($value)) < 3) {
                         $fail('O nome deve ter pelo menos 3 caracteres.');
                         return;
                     }
 
-                    // Converte para minúsculas e remove acentos para comparação
                     $nomeNormalizado = mb_strtolower($this->removerAcentos($value));
                     $palavras = explode(' ', $nomeNormalizado);
 
-                    // Verifica palavras bloqueadas
                     foreach ($palavras as $palavra) {
                         if (in_array($palavra, array_map([$this, 'removerAcentos'], $this->palavrasBloqueadas))) {
                             $fail("O nome contém palavras não permitidas para alimentos.");
@@ -70,7 +54,6 @@ class AlimentoRequest extends FormRequest
                         }
                     }
 
-                    // Verifica se pelo menos uma palavra está na lista de permitidas ou no mapa de categorias
                     $encontrouPalavraValida = false;
                     $mapaCategoria = $this->getMapaCategoria();
                     $todasPalavrasPermitidas = array_merge(
@@ -89,17 +72,14 @@ class AlimentoRequest extends FormRequest
                         $fail("O nome não parece ser de um alimento válido. Por favor, use nomes de alimentos conhecidos.");
                     }
 
-                    // Verifica se não tem números
                     if (preg_match('/\d/', $value)) {
                         $fail("O nome não deve conter números.");
                     }
 
-                    // Verifica se não tem caracteres repetidos em excesso
                     if (preg_match('/(.)\1{2,}/', $value)) {
                         $fail("O nome não deve conter caracteres repetidos em excesso.");
                     }
 
-                    // Verifica se não tem muitos espaços seguidos
                     if (preg_match('/\s{2,}/', $value)) {
                         $fail("O nome não deve conter múltiplos espaços em branco.");
                     }
@@ -115,7 +95,6 @@ class AlimentoRequest extends FormRequest
                     $categoriaNome = strtolower($categoria->nome);
                     $nomeNormalizado = mb_strtolower($this->removerAcentos($this->nome));
                     
-                    // Validações específicas por categoria
                     switch ($categoriaNome) {
                         case 'bebidas':
                             if ($value !== 'litro' && $value !== 'unidade') {
@@ -146,7 +125,6 @@ class AlimentoRequest extends FormRequest
                             break;
                     }
 
-                    // Validação para litros
                     if ($value === 'litro') {
                         $palavrasLiquidas = ['leite', 'suco', 'agua', 'refrigerante', 'vinho', 'cerveja', 'oleo', 'azeite', 'vinagre', 'iogurte'];
                         $ehLiquido = false;
@@ -163,7 +141,6 @@ class AlimentoRequest extends FormRequest
                         }
                     }
 
-                    // Validação para quilos
                     if ($value === 'quilo') {
                         $palavrasQuilo = [
                             'arroz', 'feijao', 'acucar', 'sal', 'farinha', 'cafe', 'queijo', 
@@ -182,7 +159,6 @@ class AlimentoRequest extends FormRequest
                             }
                         }
 
-                        // Se for da categoria congelados, permite medição em quilos
                         if ($categoriaNome === 'congelados') {
                             $ehPesoValido = true;
                         }
@@ -192,7 +168,6 @@ class AlimentoRequest extends FormRequest
                         }
                     }
 
-                    // Validação para unidades
                     if ($value === 'unidade') {
                         $palavrasUnidade = ['pao', 'pacote', 'lata', 'garrafa', 'caixa', 'pote', 'sache', 'ovo', 'maca', 'banana', 'laranja', 'limao', 'biscoito', 'bolacha', 'chocolate', 'barra', 'iogurte', 'leite'];
                         $ehUnidadeValida = false;
@@ -204,7 +179,6 @@ class AlimentoRequest extends FormRequest
                             }
                         }
 
-                        // Se for da categoria congelados, permite medição em unidades
                         if ($categoriaNome === 'congelados') {
                             $ehUnidadeValida = true;
                         }
@@ -238,7 +212,6 @@ class AlimentoRequest extends FormRequest
                             if ($value > 100) {
                                 $fail('A quantidade máxima permitida é 100 quilos.');
                             }
-                            // Validações específicas por categoria para quilos
                             switch ($categoriaNome) {
                                 case 'carnes':
                                     if ($value > 50) {
@@ -258,7 +231,6 @@ class AlimentoRequest extends FormRequest
                             if ($value > 50) {
                                 $fail('A quantidade máxima permitida é 50 litros.');
                             }
-                            // Validações específicas por categoria para litros
                             if ($categoriaNome === 'bebidas') {
                                 if ($value > 20) {
                                     $fail('A quantidade máxima de bebidas permitida é 20 litros.');
@@ -355,12 +327,9 @@ class AlimentoRequest extends FormRequest
                 'not_regex:/<script.*?>.*?<\/script>/i',
                 function ($attribute, $value, $fail) {
                     if (!empty($value)) {
-                        // Verifica caracteres especiais suspeitos
                         if (preg_match('/[<>{}$]/', $value)) {
                             $fail('A sugestão contém caracteres não permitidos.');
                         }
-                        
-                        // Verifica URLs maliciosas
                         if (preg_match('/(javascript|data):/i', $value)) {
                             $fail('A sugestão contém conteúdo não permitido.');
                         }
@@ -370,9 +339,7 @@ class AlimentoRequest extends FormRequest
         ];
     }
 
-    /**
-     * Remove acentos de uma string
-     */
+    // Remove acentos de uma string
     private function removerAcentos($string) {
         return strtolower(preg_replace(
             ['/[áàãâä]/u', '/[éèêë]/u', '/[íìîï]/u', '/[óòõôö]/u', '/[úùûü]/u', '/[ç]/u'],
@@ -381,9 +348,7 @@ class AlimentoRequest extends FormRequest
         ));
     }
 
-    /**
-     * Retorna o mapa de categorias e seus alimentos permitidos
-     */
+    // Retorna o mapa de categorias e seus alimentos permitidos
     private function getMapaCategoria() {
         return [
             'frutas' => ['maçã', 'banana', 'melancia', 'limão', 'laranja', 'manga', 'uva', 'abacaxi', 'goiaba', 'morango', 'kiwi', 'pera', 'pêssego', 'ameixa', 'caju', 'graviola', 'acerola', 'framboesa', 'maracujá', 'figo', 'mamão', 'abacate', 'coco', 'romã', 'pitaya', 'carambola'],

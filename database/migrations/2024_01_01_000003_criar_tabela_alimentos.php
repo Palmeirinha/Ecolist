@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('validade');
             $table->string('sugestao')->nullable();
             $table->timestamps();
-            $table->softDeletes(); // Adicionando soft deletes diretamente
+            $table->softDeletes(); 
         });
     }
 

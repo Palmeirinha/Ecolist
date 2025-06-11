@@ -1,7 +1,6 @@
 <x-app-layout>
     <div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-primary-50 to-white px-4">
         <div class="text-center max-w-4xl mx-auto">
-            {{-- Logo e título de boas-vindas --}}
             <div class="mb-8">
                 <img src="/images/logo.svg" alt="EcoList" class="w-24 h-24 mx-auto mb-6">
                 <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -12,7 +11,7 @@
                 </p>
             </div>
 
-            {{-- Botões de ação para acessar painel, login ou cadastro --}}
+            {{-- Botões principais de ação --}}
             <div class="space-y-4 md:space-y-0 md:space-x-4">
                 @auth
                     <a href="{{ route('dashboard') }}" class="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors duration-200">
@@ -37,9 +36,8 @@
                 @endauth
             </div>
 
-            <!-- Seção de funcionalidades do sistema -->
+            <!-- Funcionalidades principais do sistema -->
             <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto px-4">
-                {{-- Card: Organize seus Alimentos --}}
                 <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
                     <div class="bg-primary-100 rounded-full w-12 h-12 flex items-center justify-center mb-4 mx-auto">
                         <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,7 +48,6 @@
                     <p class="text-gray-600 text-center">Mantenha um controle eficiente dos alimentos em sua casa.</p>
                 </div>
 
-                {{-- Card: Evite Desperdício --}}
                 <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
                     <div class="bg-primary-100 rounded-full w-12 h-12 flex items-center justify-center mb-4 mx-auto">
                         <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,10 +58,9 @@
                     <p class="text-gray-600 text-center">Controle a validade dos seus alimentos de forma eficiente.</p>
                 </div>
 
-                {{-- Card: Descubra Receitas --}}
                 <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
                     <div class="bg-primary-100 rounded-full w-12 h-12 flex items-center justify-center mb-4 mx-auto">
-                        <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
                     </div>

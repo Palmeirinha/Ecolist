@@ -1,11 +1,9 @@
-{{-- Página que exibe as receitas sugeridas com base nos alimentos do usuário --}}
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 Receitas Sugeridas com Seus Alimentos
             </h2>
-            {{-- Botão para voltar para a lista de alimentos --}}
             <a href="{{ route('alimentos.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors duration-200">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
@@ -17,7 +15,6 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            {{-- Caso não haja receitas sugeridas --}}
             @if(empty($receitas))
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
                     <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -26,7 +23,6 @@
                     <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">Nenhuma receita encontrada</h3>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Não encontramos receitas que utilizem seus alimentos disponíveis.</p>
                     <div class="mt-6">
-                        {{-- Botão para adicionar novos alimentos --}}
                         <a href="{{ route('alimentos.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -40,7 +36,6 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($receitas as $receita)
                         <div class="bg-white dark:bg-gray-700 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200">
-                            {{-- Imagem e nome da receita --}}
                             <div class="relative h-48">
                                 <img src="{{ $receita['strMealThumb'] }}" alt="{{ $receita['strMeal'] }}" class="w-full h-full object-cover">
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -50,7 +45,6 @@
                             </div>
 
                             <div class="p-4 space-y-4">
-                                {{-- Exibe a categoria da receita, se houver --}}
                                 @if(isset($receita['strCategory']))
                                     <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,7 +54,6 @@
                                     </div>
                                 @endif
 
-                                {{-- Exibe a culinária/origem da receita, se houver --}}
                                 @if(isset($receita['strArea']))
                                     <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,7 +63,6 @@
                                     </div>
                                 @endif
 
-                                {{-- Lista de ingredientes da receita --}}
                                 @if(isset($receita['ingredientes']) && count($receita['ingredientes']) > 0)
                                     <div class="border-t dark:border-gray-600 pt-4">
                                         <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Ingredientes:</h4>

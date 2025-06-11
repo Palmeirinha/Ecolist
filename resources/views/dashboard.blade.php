@@ -14,7 +14,6 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Cards de Resumo -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <!-- Total de Alimentos -->
                 <div class="bg-white overflow-hidden shadow-sm rounded-lg hover:shadow-md transition-shadow duration-200">
                     <div class="p-6 border-b border-gray-200 bg-green-50">
                         <div class="flex items-center">
@@ -30,8 +29,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Vencendo em Breve -->
                 <div class="bg-white overflow-hidden shadow-sm rounded-lg hover:shadow-md transition-shadow duration-200">
                     <div class="p-6 border-b border-gray-200 bg-yellow-50">
                         <div class="flex items-center">
@@ -47,8 +44,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Vencidos -->
                 <div class="bg-white overflow-hidden shadow-sm rounded-lg hover:shadow-md transition-shadow duration-200">
                     <div class="p-6 border-b border-gray-200 bg-red-50">
                         <div class="flex items-center">
@@ -97,7 +92,6 @@
                         </table>
                     </div>
                 </div>
-
                 <!-- Estatísticas da Semana -->
                 <div class="bg-white overflow-hidden shadow-sm rounded-lg p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Estatísticas dos Últimos 7 Dias</h3>

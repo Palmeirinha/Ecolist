@@ -11,36 +11,14 @@ use Carbon\Carbon;
 
 /**
  * Modelo Alimento - Representa um alimento no sistema
- * 
- * Este modelo gerencia todas as operações relacionadas aos alimentos cadastrados pelos usuários,
- * incluindo validações, relacionamentos e regras de negócio específicas.
- * 
- * @property int $id Identificador único do alimento
- * @property string $nome Nome do alimento
- * @property string $tipo_quantidade Tipo de medida (unidade, quilo, litro)
- * @property float $quantidade Quantidade do alimento
- * @property date $validade Data de validade
- * @property int $categoria_id ID da categoria relacionada
- * @property int $user_id ID do usuário proprietário
- * @property \Carbon\Carbon $created_at Data de criação
- * @property \Carbon\Carbon $updated_at Data de atualização
  */
 class Alimento extends Model
 {
     use HasFactory;
-    use SoftDeletes; // Permite exclusão lógica (soft delete)
+    use SoftDeletes;
 
-    /**
-     * Nome da tabela associada ao modelo
-     *
-     * @var string
-     */
     protected $table = 'alimentos';
 
-    /**
-     * Atributos que podem ser preenchidos em massa
-     * Protege contra vulnerabilidades de mass assignment
-     */
     protected $fillable = [
         'nome',
         'tipo_quantidade',
@@ -51,18 +29,12 @@ class Alimento extends Model
         'sugestao'
     ];
 
-    /**
-     * Atributos que devem ser convertidos para tipos específicos
-     */
     protected $casts = [
         'validade' => 'date',
         'quantidade' => 'float',
     ];
 
-    /**
-     * Regras de validação para o alimento
-     * Usadas no AlimentoRequest para validar os dados de entrada
-     */
+    // Regras de validação para o alimento
     public static $rules = [
         'nome' => 'required|string|max:255|min:3',
         'tipo_quantidade' => 'required|in:unidade,quilo,litro',
@@ -72,28 +44,17 @@ class Alimento extends Model
         'sugestao' => 'nullable|string|max:255'
     ];
 
-    /**
-     * Relacionamento: Pertence a uma Categoria
-     * Define a relação entre Alimento e Categoria (N:1)
-     */
     public function categoria()
     {
         return $this->belongsTo(Categoria::class, 'categoria_id');
     }
 
-    /**
-     * Relacionamento: Pertence a um Usuário
-     * Define a relação entre Alimento e User (N:1)
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Escopo: Alimentos próximos do vencimento
-     * Filtra alimentos que vencem em até X dias
-     */
+    // Escopo: Alimentos próximos do vencimento
     public function scopeProximosDoVencimento($query, $dias = 7)
     {
         return $query->whereBetween('validade', [
@@ -102,32 +63,21 @@ class Alimento extends Model
         ]);
     }
 
-    /**
-     * Escopo: Alimentos vencidos
-     * Filtra alimentos já vencidos
-     */
+    // Escopo: Alimentos vencidos
     public function scopeVencidos($query)
     {
         return $query->where('validade', '<', now());
     }
 
-    /**
-     * Escopo: Alimentos por categoria
-     * Filtra alimentos de uma categoria específica
-     */
     public function scopePorCategoria($query, $categoriaId)
     {
         return $query->where('categoria_id', $categoriaId);
     }
 
-    /**
-     * Acessor: Formata a quantidade para exibição
-     * Retorna a quantidade formatada com o tipo de medida
-     */
+    // Formata a quantidade para exibição
     public function getQuantidadeFormatadaAttribute()
     {
         $quantidade = number_format($this->quantidade, 2, ',', '.');
-        
         switch ($this->tipo_quantidade) {
             case 'unidade':
                 return "{$quantidade} un";
@@ -140,36 +90,25 @@ class Alimento extends Model
         }
     }
 
-    /**
-     * Acessor: Status do alimento
-     * Retorna o status atual do alimento (Normal, Próximo do vencimento, Vencido)
-     */
+    // Status do alimento (Normal, Próximo do vencimento, Vencido)
     public function getStatusAttribute()
     {
         if ($this->validade < now()) {
             return 'Vencido';
         }
-
         $diasParaVencer = now()->diffInDays($this->validade, false);
-        
         if ($diasParaVencer <= 7) {
             return 'Próximo do vencimento';
         }
-
         return 'Normal';
     }
 
-    /**
-     * Calcula quantos dias faltam para o alimento vencer
-     *
-     * @return string
-     */
+    // Dias restantes para vencer
     public function getDiasRestantesAttribute()
     {
         if (!$this->validade) {
             return '0 dias';
         }
-
         $hoje = Carbon::now()->startOfDay();
         $validade = Carbon::parse($this->validade)->startOfDay();
         $dias = $hoje->diffInDays($validade, false);
@@ -183,46 +122,32 @@ class Alimento extends Model
         }
     }
 
-    /**
-     * Acessor: Formata a data de validade
-     */
     public function getDataValidadeAttribute()
     {
         return $this->validade ? $this->validade->format('d/m/Y') : '';
     }
 
-    /**
-     * Verifica se o alimento está vencido
-     */
     public function getVencidoAttribute()
     {
         return $this->validade ? $this->validade->isPast() : false;
     }
 
-    /**
-     * Verifica se o alimento está próximo do vencimento (3 dias ou menos)
-     */
+    // Próximo do vencimento (3 dias ou menos)
     public function getVencendoAttribute()
     {
         if (!$this->validade) {
             return false;
         }
-
         $diasParaVencer = now()->diffInDays($this->validade, false);
         return $diasParaVencer >= 0 && $diasParaVencer <= 3;
     }
 
-    /**
-     * Acessor: Retorna a sugestão de receita para o alimento
-     * Se não houver sugestão definida, retorna uma sugestão padrão baseada no nome
-     */
+    // Sugestão de receita para o alimento
     public function getSugestaoAttribute($value)
     {
         if (!empty($value)) {
             return $value;
         }
-
-        // Sugestões padrão baseadas no nome do alimento
         $sugestoes = [
             'arroz' => 'Arroz à grega',
             'feijão' => 'Feijoada',
@@ -235,14 +160,12 @@ class Alimento extends Model
             'maçã' => 'Torta de maçã',
             'chocolate' => 'Bolo de chocolate'
         ];
-
         $nomeNormalizado = mb_strtolower($this->nome);
         foreach ($sugestoes as $ingrediente => $sugestao) {
             if (str_contains($nomeNormalizado, $ingrediente)) {
                 return $sugestao;
             }
         }
-
         return null;
     }
 
@@ -251,14 +174,10 @@ class Alimento extends Model
     {
         parent::boot();
 
-        // Antes de salvar
         static::saving(function ($alimento) {
-            // Garante que a quantidade seja positiva
             if ($alimento->quantidade < 0) {
                 $alimento->quantidade = 0;
             }
-
-            // Limita o tamanho do nome
             if (strlen($alimento->nome) > 255) {
                 $alimento->nome = substr($alimento->nome, 0, 255);
             }
