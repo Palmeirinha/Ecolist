@@ -56,7 +56,6 @@ class DashboardController extends Controller
             ->orderBy('total', 'desc')
             ->get()
             ->map(function($categoria) {
-                // Calcula a porcentagem de cada categoria em relação ao total de alimentos
                 return [
                     'nome' => $categoria->nome,
                     'total' => $categoria->total,
