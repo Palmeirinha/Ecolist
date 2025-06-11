@@ -9,25 +9,29 @@ use Illuminate\Support\Facades\DB;
 class DashboardController extends Controller
 {
     /**
-     * Exibe o dashboard com estatísticas dos alimentos
+     * Exibe o dashboard com estatísticas dos alimentos do usuário
      * 
      * @return \Illuminate\View\View
      */
     public function index()
     {
-        $userId = auth()->id();
+        $userId = auth()->id(); 
 
+        // total alimentos cadastrados pelo usuário
         $total = Alimento::where('user_id', $userId)->count();
 
+        //  alimentos que vão vencer 
         $vencendo = Alimento::where('user_id', $userId)
             ->whereDate('validade', '<=', now()->addDays(3))
             ->whereDate('validade', '>=', now())
             ->count();
 
+        //  alimentos vencidos
         $vencidos = Alimento::where('user_id', $userId)
             ->whereDate('validade', '<', now())
             ->count();
 
+        // alimentos recentemente cadastrados
         $alimentosRecentes = Alimento::with('categoria')
             ->where('user_id', $userId)
             ->orderBy('created_at', 'desc')
@@ -41,7 +45,7 @@ class DashboardController extends Controller
             ->orderBy('validade')
             ->get();
 
-        // Gera resumo estatístico por categoria
+        //  alimentos existentes por categoria
         $resumoCategorias = Categoria::select('categorias.nome', DB::raw('COUNT(alimentos.id) as total'))
             ->leftJoin('alimentos', function($join) use ($userId) {
                 $join->on('categorias.id', '=', 'alimentos.categoria_id')
@@ -52,6 +56,7 @@ class DashboardController extends Controller
             ->orderBy('total', 'desc')
             ->get()
             ->map(function($categoria) {
+                // Calcula a porcentagem de cada categoria em relação ao total de alimentos
                 return [
                     'nome' => $categoria->nome,
                     'total' => $categoria->total,
@@ -59,6 +64,7 @@ class DashboardController extends Controller
                 ];
             });
 
+        // alimentos cadastrados e vencidos 
         $estatisticasSemana = [
             'cadastrados' => Alimento::where('user_id', $userId)
                 ->where('created_at', '>=', now()->subDays(7))

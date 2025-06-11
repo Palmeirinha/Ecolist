@@ -9,29 +9,32 @@ use App\Http\Requests\AlimentoRequest;
 
 class AlimentoController extends Controller
 {
+    // Alimentos do usuário filtra por categoria 
     public function index(Request $request)
     {
         $user = auth()->user();
         $query = $user->alimentos()->with('categoria');
         $categoriaId = $request->categoria_id;
         if (!empty($categoriaId)) {
-            $query->porCategoria($categoriaId);
+            $query->porCategoria($categoriaId); 
         }
-        $alimentos = $query->orderBy('validade')->paginate(10);
-        $categorias = Categoria::all();
+        $alimentos = $query->orderBy('validade')->paginate(10); 
+        $categorias = Categoria::all(); 
         return view('alimentos.index', compact('alimentos', 'categorias', 'categoriaId'));
     }
 
+    // Mostra o formulário para cadastrar um novo alimento
     public function create()
     {
-        $categorias = Categoria::all();
+        $categorias = Categoria::all(); 
         return view('alimentos.create', compact('categorias'));
     }
 
+    // Salva um novo alimento no banco de dados
     public function store(AlimentoRequest $request)
     {
         try {
-            $dados = $request->validated();
+            $dados = $request->validated(); 
             $categoria = Categoria::find($dados['categoria_id']);
             if (!$categoria) {
                 return redirect()
@@ -39,7 +42,7 @@ class AlimentoController extends Controller
                     ->withInput()
                     ->with('error', 'A categoria selecionada não existe.');
             }
-            $dados['user_id'] = auth()->id();
+            $dados['user_id'] = auth()->id(); // Associa o alimento ao usuário logado
             $alimento = Alimento::create($dados);
 
             return redirect()
@@ -53,9 +56,11 @@ class AlimentoController extends Controller
         }
     }
 
+    // Mostra o formulário para editar um alimento existente
     public function edit(Alimento $alimento)
     {
         if ($alimento->user_id !== auth()->id()) {
+      
             return redirect()
                 ->route('alimentos.index')
                 ->with('error', 'Você não tem permissão para editar este alimento.');
@@ -65,6 +70,7 @@ class AlimentoController extends Controller
         return view('alimentos.edit', compact('alimento', 'categorias'));
     }
 
+  
     public function update(AlimentoRequest $request, Alimento $alimento)
     {
         try {
@@ -88,6 +94,7 @@ class AlimentoController extends Controller
         }
     }
 
+    // Exclui um alimento do banco de dados
     public function destroy(Alimento $alimento)
     {
         try {
@@ -109,20 +116,20 @@ class AlimentoController extends Controller
         }
     }
 
-    // Busca receitas baseadas nos alimentos do usuário
+    // Busca receitas baseadas nos alimentos cadastrados pelo usuário
     public function buscarReceitas(ReceitaService $receitaService)
     {
-        $alimentos = Alimento::where('user_id', auth()->id())->pluck('nome')->toArray();
+        $alimentos = Alimento::where('user_id', auth()->id())->pluck('nome')->toArray(); // Pega nomes dos alimentos do usuário
         $todasReceitas = [];
 
         foreach ($alimentos as $alimento) {
-            $receitas = $receitaService->buscarReceitas($alimento);
+            $receitas = $receitaService->buscarReceitas($alimento); // Busca receitas para cada alimento
             if (!empty($receitas)) {
-                $todasReceitas = array_merge($todasReceitas, $receitas);
+                $todasReceitas = array_merge($todasReceitas, $receitas); // une receitas encontradas
             }
         }
 
-        $receitasUnicas = collect($todasReceitas)->unique('id')->values()->all();
+        $receitasUnicas = collect($todasReceitas)->unique('id')->values()->all(); // Remove receitas duplicadas
 
         return view('alimentos.receitas', ['receitas' => $receitasUnicas]);
     }

@@ -348,7 +348,7 @@ class AlimentoRequest extends FormRequest
         ));
     }
 
-    // Retorna o mapa de categorias e seus alimentos permitidos
+    // Retorna os alimentos permitidos
     private function getMapaCategoria() {
         return [
             'frutas' => ['maçã', 'banana', 'melancia', 'limão', 'laranja', 'manga', 'uva', 'abacaxi', 'goiaba', 'morango', 'kiwi', 'pera', 'pêssego', 'ameixa', 'caju', 'graviola', 'acerola', 'framboesa', 'maracujá', 'figo', 'mamão', 'abacate', 'coco', 'romã', 'pitaya', 'carambola'],
